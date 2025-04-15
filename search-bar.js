@@ -9,7 +9,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { LitElement, html, css } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './ingredient';
 /**
@@ -22,11 +22,9 @@ import './ingredient';
 let SearchBar = class SearchBar extends LitElement {
     constructor() {
         super(...arguments);
+        this.recipes_item = [];
         this.searchQuery = '';
         this.results = [];
-        // Sample recipes
-        this.recipe1 = new Recipe("Spaghetti Bolognese", "A classic Italian pasta dish with rich meat sauce.", ["Spaghetti", "Ground beef", "Tomato sauce", "Garlic", "Onion"], "https://recipe.com", "https://example.com/spaghetti.jpg", 4, ["Coucou", "Ceci est une instruction"]);
-        this.recipe2 = new Recipe("Chicken Alfredo", "Creamy pasta with grilled chicken and Alfredo sauce.", ["Fettuccine", "Chicken", "Alfredo sauce", "Parmesan"], "https://recipe.com", "https://example.com/chicken-alfredo.jpg", 5, ["Coucou", "Ceci est une autre instruction"]);
     }
     handleInputChange(event) {
         const input = event.target;
@@ -36,7 +34,22 @@ let SearchBar = class SearchBar extends LitElement {
         if (this.searchQuery) {
             this.results = this.results.concat(this.searchQuery.split(',').map(ingredient => ingredient.trim()).filter(ingredient => ingredient.length > 0));
             this.searchQuery = ''; // Clear the input after submission
+            this.parse_recipes().then();
         }
+    }
+    async parse_recipes() {
+        const args = this.results.join(",");
+        const str = "http://localhost:8080/api/recipes/search?ingredients=" + args;
+        console.log(str);
+        const response = await fetch(str);
+        if (!response.ok) {
+            throw new Error("Unable to reach self hosted API");
+        }
+        this.recipes_item = await response.json();
+        console.log(this.recipes_item);
+        console.log(this.recipes_item[0].directions);
+        const recipeListEl = document.querySelector('recipe-list');
+        recipeListEl.recipes = this.recipes_item;
     }
     render() {
         return html `
@@ -47,32 +60,17 @@ let SearchBar = class SearchBar extends LitElement {
           @input="${this.handleInputChange}"
           placeholder="Entrez les ingrédients"
         />
-        <recipe-item .recipe=${ = "${this.handleSearch}" > Rechercher < /button>
-            < div;
-        class {
-        }
-        "result" >
-            $;
-        {
-            this.results.length > 0
-                ? html `<ul>
+        <button @click="${this.handleSearch}">Rechercher</button>
+
+        <div class="result">
+          ${this.results.length > 0
+            ? html `<ul>
                 ${this.results.map((ingredient) => html `<ingredient-item .name="${ingredient}"></ingredient-item>`)}
               </ul>`
-                : 'Aucun ingrédient ajouté.';
-        }
-        /div>
-            < /div> `;
-  }
-
-
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'search-bar': SearchBar;
-  }
-}
-        ;
+            : 'Aucun ingrédient ajouté.'}
+        </div>
+      </div>
+    `;
     }
 };
 SearchBar.styles = css `

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-import {LitElement, html, css} from 'lit';
+import {css, html, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import './ingredient'
 
@@ -17,6 +17,9 @@ import './ingredient'
  */
 @customElement('search-bar')
 export class SearchBar extends LitElement {
+
+  recipes_item : Recipe[] = [];
+
   static override styles = css`
     :host {
       display: block;
@@ -63,9 +66,6 @@ export class SearchBar extends LitElement {
     }
   `;
 
-
-
-
   @property({type: String})
   searchQuery = '';
 
@@ -81,29 +81,26 @@ export class SearchBar extends LitElement {
     if (this.searchQuery) {
       this.results = this.results.concat(this.searchQuery.split(',').map(ingredient => ingredient.trim()).filter(ingredient => ingredient.length > 0));
       this.searchQuery = ''; // Clear the input after submission
+      this.parse_recipes().then();
     }
   }
 
-  // Sample recipes
-  recipe1 = new Recipe(
-      "Spaghetti Bolognese",
-      "A classic Italian pasta dish with rich meat sauce.",
-      ["Spaghetti", "Ground beef", "Tomato sauce", "Garlic", "Onion"],
-      "https://recipe.com",
-      "https://example.com/spaghetti.jpg",
-      4,
-      ["Coucou", "Ceci est une instruction"]
-  );
+  private async parse_recipes() {
+    const args = this.results.join(",");
+    const str = "http://localhost:8080/api/recipes/search?ingredients=" + args;
+    console.log(str);
+    const response = await fetch(str);
+    if (!response.ok) {
+      throw new Error("Unable to reach self hosted API")
+    }
+    this.recipes_item = await response.json();
+    console.log(this.recipes_item)
+    console.log(this.recipes_item[0].directions)
 
-  recipe2 = new Recipe(
-      "Chicken Alfredo",
-      "Creamy pasta with grilled chicken and Alfredo sauce.",
-      ["Fettuccine", "Chicken", "Alfredo sauce", "Parmesan"],
-      "https://recipe.com",
-      "https://example.com/chicken-alfredo.jpg",
-      5,
-      ["Coucou", "Ceci est une autre instruction"]
-  );
+    const recipeListEl = document.querySelector('recipe-list') as any;
+    recipeListEl.recipes = this.recipes_item;
+  }
+
 
   override render() {
     return html`
@@ -114,7 +111,6 @@ export class SearchBar extends LitElement {
           @input="${this.handleInputChange}"
           placeholder="Entrez les ingrédients"
         />
-        <recipe-item .recipe=${
         <button @click="${this.handleSearch}">Rechercher</button>
 
         <div class="result">

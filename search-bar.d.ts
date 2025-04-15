@@ -13,13 +13,18 @@ import './ingredient';
  * @csspart button - The button
  */
 export declare class SearchBar extends LitElement {
+    recipes_item: Recipe[];
     static styles: import("lit").CSSResult;
     searchQuery: string;
     results: string[];
     handleInputChange(event: Event): void;
     handleSearch(): void;
-    recipe1: Recipe;
-    recipe2: Recipe;
-    render(): boolean;
+    private parse_recipes;
+    render(): import("lit-html").TemplateResult<1>;
+}
+declare global {
+    interface HTMLElementTagNameMap {
+        'search-bar': SearchBar;
+    }
 }
 //# sourceMappingURL=search-bar.d.ts.map

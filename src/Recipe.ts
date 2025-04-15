@@ -1,6 +1,6 @@
 class Recipe {
     // Define the properties with their types
-    name: string;
+    title: string;
     description: string;
     ingredients: string[];
     url : string;
@@ -14,7 +14,7 @@ class Recipe {
         if (!name || !description || !ingredients || ingredients.length === 0) {
             throw new Error("Missing required properties or ingredients.");
         }
-        this.name = name;
+        this.title = name;
         this.description = description;
         this.ingredients = ingredients;
         this.url = url;
@@ -30,7 +30,7 @@ class Recipe {
 
     // You could add more methods to interact with the recipe
     printRecipeDetails(): void {
-        console.log(`Recipe: ${this.name}`);
+        console.log(`Recipe: ${this.title}`);
         console.log(`Description: ${this.description}`);
         console.log(`Ingredients: ${this.getIngredientsList()}`);
     }

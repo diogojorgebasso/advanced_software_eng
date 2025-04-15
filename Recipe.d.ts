@@ -1,5 +1,5 @@
 declare class Recipe {
-    name: string;
+    title: string;
     description: string;
     ingredients: string[];
     url: string;
