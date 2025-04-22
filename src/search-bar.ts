@@ -93,9 +93,10 @@ export class SearchBar extends LitElement {
     if (!response.ok) {
       throw new Error("Unable to reach self hosted API")
     }
+    //console.log(response);
     this.recipes_item = await response.json();
-    console.log(this.recipes_item)
-    console.log(this.recipes_item[0].directions)
+    //console.log(this.recipes_item)
+    // console.log(this.recipes_item[0].directions)
 
     const recipeListEl = document.querySelector('recipe-list') as any;
     recipeListEl.recipes = this.recipes_item;

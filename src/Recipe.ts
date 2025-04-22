@@ -4,13 +4,13 @@ class Recipe {
     description: string;
     ingredients: string[];
     url : string;
-    image_link: string;
+    image: string;
     rating: number;
     directions: string[];
 
 
     // Constructor ensures all required properties are provided
-    constructor(name: string, description: string, ingredients: string[], url: string, image_link: string, rating: number, directions: string[]) {
+    constructor(name: string, description: string, ingredients: string[], url: string, image: string, rating: number, directions: string[]) {
         if (!name || !description || !ingredients || ingredients.length === 0) {
             throw new Error("Missing required properties or ingredients.");
         }
@@ -18,7 +18,7 @@ class Recipe {
         this.description = description;
         this.ingredients = ingredients;
         this.url = url;
-        this.image_link = image_link;
+        this.image = image;
         this.rating = rating;
         this.directions = directions;
     }

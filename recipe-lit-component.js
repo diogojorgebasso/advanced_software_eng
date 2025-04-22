@@ -10,8 +10,8 @@ let RecipeItem = class RecipeItem extends LitElement {
     render() {
         return html `
       <div>
-        <img src="${this.recipe.image_link}" alt="${this.recipe.name}" class="recipe-image"/>
-        <div class="recipe-name">${this.recipe.name}</div>
+        <img src="${this.recipe.image}" alt="${this.recipe.title}" class="recipe-image"/>
+        <div class="recipe-name">${this.recipe.title}</div>
         <div class="recipe-rating">Rating: <span>${this.recipe.rating}</span></div>
         <div class="recipe-description">${this.recipe.description}</div>
       </div>

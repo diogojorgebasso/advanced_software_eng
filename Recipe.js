@@ -1,7 +1,7 @@
 "use strict";
 class Recipe {
     // Constructor ensures all required properties are provided
-    constructor(name, description, ingredients, url, image_link, rating, directions) {
+    constructor(name, description, ingredients, url, image, rating, directions) {
         if (!name || !description || !ingredients || ingredients.length === 0) {
             throw new Error("Missing required properties or ingredients.");
         }
@@ -9,7 +9,7 @@ class Recipe {
         this.description = description;
         this.ingredients = ingredients;
         this.url = url;
-        this.image_link = image_link;
+        this.image = image;
         this.rating = rating;
         this.directions = directions;
     }
