@@ -1,0 +1,89 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutButton = document.getElementById('logoutButton');
+  const loginButton = document.getElementById('loginButton');
+  const helloUser = document.getElementById('helloUser');
+
+  //checking if we're authenticated before anything
+  checkAuthentication();
+
+
+    //login button handling
+  loginButton.addEventListener('click', () => {
+      window.location.href = 'http://localhost:8000/dev/login.html';
+  });
+
+
+
+    //logout button handling
+    logoutButton.addEventListener('click', async () => {
+    try {
+        const response = await fetch('http://localhost:8080/api/auth/logout', {
+            method: 'POST', 
+            credentials: 'include'
+        });
+
+        console.log('Logout response:', response);
+
+        if (response.ok) {
+            //checking authentication before redirecting
+            await checkAuthentication();
+            // redirecting to the logout view
+            window.location.href = 'http://localhost:8000/dev/logout.html';
+        } else {
+            console.error('Logout failed with status:', response.status);
+        }
+    } catch (error) {
+        console.error('Erreur de déconnexion:', error);
+    }
+    });
+
+
+
+  async function checkAuthentication() {
+    try {
+        const response = await fetch('http://localhost:8080/api/auth/current-user', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        console.log("Auth check response:", response); 
+
+        if (response.ok) {
+            const userData = await response.json();
+            console.log("userData:", userData); 
+            updateUIForAuthenticatedUser(userData);
+            
+            //Not necessary after all
+            /*
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('login')) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }*/
+
+        } else {
+            updateUIForUnauthenticatedUser();
+        }
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        updateUIForUnauthenticatedUser();
+    }
+}
+
+  //dynamic buttons ! If we're logged in, the hello user div and logout btn appear
+  //If we're not logged in, the log in btn appears
+  function updateUIForAuthenticatedUser(userData) {
+      helloUser.textContent = `Hello ${userData.username || 'User'}`;
+      helloUser.style.display = 'inline-block';
+      loginButton.style.display = 'none';
+      logoutButton.style.display = 'inline-block';
+  }
+
+  function updateUIForUnauthenticatedUser() {
+      helloUser.textContent = '';
+      helloUser.style.display = 'none';
+      loginButton.style.display = 'inline-block';
+      logoutButton.style.display = 'none';
+  }
+
+
+});
