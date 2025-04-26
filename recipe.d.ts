@@ -1,17 +1,13 @@
-import { LitElement } from 'lit';
-export declare class RecipeItem extends LitElement {
-    name: string;
-    url: string;
-    image_link: string | undefined;
-    rating: number;
+declare class Recipe {
+    title: string;
+    description: string;
     ingredients: string[];
+    url: string;
+    image: string;
+    rating: number;
     directions: string[];
-    static styles: import("lit").CSSResult;
-    protected render(): import("lit-html").TemplateResult<1>;
+    constructor(name: string, description: string, ingredients: string[], url: string, image: string, rating: number, directions: string[]);
+    getIngredientsList(): string;
+    printRecipeDetails(): void;
 }
-declare global {
-    interface HTMLElementTagNameMap {
-        'recipe-item': RecipeItem;
-    }
-}
-//# sourceMappingURL=recipe.d.ts.map
+//# sourceMappingURL=Recipe.d.ts.map
