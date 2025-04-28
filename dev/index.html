@@ -9,6 +9,8 @@
     <script type="module" src="../search-bar.js"></script>
     <script type="module" src="../ingredient.js"></script>
     <script type="module" src="../recipe-list.js"></script>
+    <script src="dev-scripts/logout-login-btn"></script>
+   
     <style>
       p {
         border: solid 1px blue;
@@ -17,6 +19,13 @@
     </style>
   </head>
   <body>
+    
+    <div id="helloUser" class="helloUser"></div>
+
+    <button id="loginButton" class="auth-btn">Login</button>
+    
+    <button id="logoutButton" class="auth-btn" style="display:none;">Logout</button>
+    
     <search-bar>
     </search-bar>
     <recipe-list></recipe-list>

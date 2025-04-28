@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Connexion</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="dev-css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Connexion</h2>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="submit-button">Se connecter</button>
+            
+           
+        </form>
+        <div id="errorMessage" class="error-message"></div>
+
+        
+        <a class="register-button" href="http://localhost:8000/dev/register.html">
+            S'inscrire
+        </a>
+        
+        
+    
+        <div class="oauth-buttons">
+            <a class="oauth-button google-button" href="http://localhost:8080/oauth2/authorization/google">
+                Se connecter avec Google
+            </a>
+            <a class="oauth-button github-button" href="http://localhost:8080/oauth2/authorization/github">
+                Se connecter avec GitHub
+            </a>
+        </div>
+    </div>
+
+    <script src="dev-scripts/login.js"></script>
+</body>
+</html>
