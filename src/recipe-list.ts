@@ -39,9 +39,10 @@ export class RecipeList extends LitElement {
             : this.recipes.map(
                 (recipe: any) => html`
                 <div class="recipe">
-                  <img src="${recipe.image}" alt="${recipe.title}" />
+                    <a href="/src/page-recette.html?id=${recipe.id}" class="recipe-link">
+                  <img src="${recipe.image}" />
                   <div class="info">
-                    <strong>${recipe.name}</strong>
+                    <strong>${recipe.title}</strong>
                     <span class="rating">⭐ ${recipe.rating}</span>
                   </div>
                 </div>

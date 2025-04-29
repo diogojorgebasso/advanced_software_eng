@@ -1,1 +1,1 @@
-{"version":3,"file":"recipe-list.d.ts","sourceRoot":"","sources":["src/recipe-list.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAa,MAAM,KAAK,CAAC;AAG5C,qBACa,UAAW,SAAQ,UAAU;IACtC,OAAgB,MAAM,0BAuBtB;IAGA,OAAO,EAAE,MAAM,EAAE,CAAM;IAEd,MAAM;CAmBlB"}
+{"version":3,"file":"recipe-list.d.ts","sourceRoot":"","sources":["src/recipe-list.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAa,MAAM,KAAK,CAAC;AAG5C,qBACa,UAAW,SAAQ,UAAU;IACtC,OAAgB,MAAM,0BAuBtB;IAGA,OAAO,EAAE,MAAM,EAAE,CAAM;IAEd,MAAM;CAoBlB"}
