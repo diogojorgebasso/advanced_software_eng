@@ -21,7 +21,6 @@ let RecipeList = class RecipeList extends LitElement {
                   <div class="info">
                       <img src="${recipe.image}" />
                     <a href="/src/page-recette.html?id=${recipe.id}" class="recipe-link">
-                  <img src="${recipe.image}" />
                   <div class="info">
                     <strong>${recipe.title}</strong>
                     <span class="rating">⭐ ${recipe.rating}</span>
