@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Détail de Recette</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+   </head>
+
+   <script>
+   //récupère l'id de la recette dans l'url
+   const urlParams = new URLSearchParams(window.location.search);
+   const recipeId = urlParams.get('id');
+
+
+
+   //charge la recette (titre, image, ingrédients...)
+   async function loadRecipeDetails() {
+      try {
+
+         
+            const response_auth = await fetch('http://localhost:8080/api/auth/current-user', {
+               method: 'GET',
+               credentials: 'include'
+            });
+
+
+         if (response_auth.ok) {
+            const userData = await response_auth.json();
+            console.log("userData:", userData); 
+            document.getElementById("username-display").textContent = userData.username;
+         }
+         else {
+            document.getElementById("username-display").textContent = "";
+         }
+
+         const response = await fetch(`http://localhost:8080/api/recipes/${recipeId}`);
+         const recipe = await response.json();
+
+         document.getElementById("recipe-title").textContent = recipe.title;
+         document.getElementById("recipe-image").src = recipe.image || "placeholder.jpg";
+         document.getElementById("recipe-rating").textContent = recipe.rating + " ★ /5";
+         //Remplir la liste des ingrédients
+         const ingredientsList = document.getElementById("recipe-ingredients");
+         ingredientsList.innerHTML = "";
+         recipe.ingredients.forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = item.ingredient; // Utiliser la clé "ingredient" ici
+            ingredientsList.appendChild(li);
+         });
+         document.getElementById("recipe-instructions").textContent = recipe.directions
+            .map(step => step.step)
+            .join(" ");
+
+      } catch (error) {
+         console.error("Erreur en chargeant la recette :", error);
+      }
+   }
+
+   //Charge la note
+   async function loadRecipeRating() {
+      try {
+         const response = await fetch(`http://localhost:8080/ratings/${recipeId}/average`);
+         const ratingValue = await response.json(); // Ici, c’est directement un nombre
+
+         if (ratingValue > 0) {
+            document.getElementById("recipe-rating").textContent = ratingValue.toFixed(1) + " ★ /5";
+         } else {
+            document.getElementById("recipe-rating").textContent = "Pas de note disponible";
+         }
+      } catch (error) {
+         console.error("Erreur en chargeant la note de la recette :", error);
+         document.getElementById("recipe-rating").textContent = "Erreur de récupération de la note";
+      }
+   }
+
+
+
+   // Charger les commentaires de la recette
+   async function loadComments() {
+      try {
+         const response = await fetch(`http://localhost:8080/comments/recipe/${recipeId}`);
+         const comments = await response.json();
+
+         const commentsContainer = document.querySelector(".mt-10 .space-y-6");
+         commentsContainer.innerHTML = ""; // vider les anciens exemples
+
+         comments.forEach(comment => {
+            const commentDiv = document.createElement("div");
+            commentDiv.className = "p-4 bg-gray-50 rounded-lg shadow";
+            commentDiv.innerHTML = `
+<div class="flex justify-between items-center mb-2">
+   <span class="font-bold text-indigo-600">${comment.author || "Anonyme"}</span>
+</div>
+<p class="text-gray-700">${comment.text}</p>
+`;
+            commentsContainer.appendChild(commentDiv);
+         });
+      } catch (error) {
+         console.error("Erreur en chargeant les commentaires :", error);
+      }
+   }
+
+   //execute les fonctions
+   if (recipeId) {
+      loadRecipeDetails();
+      loadComments();
+      loadRecipeRating(); 
+   } else {
+      alert("Aucune recette sélectionnée.");
+   }
+
+
+
+   //Envoie d'un nouveau commentaire/note
+   document.addEventListener("DOMContentLoaded", () => {
+      const commentBtn = document.getElementById("send-comment");
+      const ratingBtn = document.getElementById("send-rating");
+
+
+      //Envoie commenatire
+      commentBtn.addEventListener("click", async () => {
+         const commentText = document.getElementById("comment-text").value.trim();
+
+         if (!commentText) {
+            alert("Veuillez écrire un commentaire.");
+            return;
+         }
+
+         try {
+            const response_test = await fetch('http://localhost:8080/api/auth/current-user', {
+               method: 'GET',
+               credentials: 'include'
+            });
+
+            console.log("Auth check response:", response_test); 
+
+            if (response_test.ok) {
+               const userData = await response_test.json();
+               console.log("userData:", userData); 
+               document.getElementById("username-display").value = userData.username;
+               const response = await fetch(`http://localhost:8080/comments/recipe/${recipeId}`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                     text: commentText,
+                     author: userData.username // à remplacer plus tard par l'utilisateur connect
+                  })
+
+               });
+
+
+               if (!response.ok) throw new Error("Erreur lors de l'envoi du commentaire.");
+               document.getElementById("comment-text").value = "";
+               loadComments();
+            }
+            /*
+            const response_author = await fetch('http://localhost:8080/api/auth/current-user');
+            const author = await response_author.json();
+            console.log(author);
+            */
+
+         } catch (error) {
+            console.error(error);
+            alert("Erreur lors de l'envoi du commentaire.");
+         }
+      });
+
+      // Envoi de note (version corrigée)
+      ratingBtn.addEventListener("click", async () => {
+         const ratingValue = parseInt(document.getElementById("comment-rating").value);
+
+         if (isNaN(ratingValue)) { // Correction ici
+            alert("Veuillez sélectionner une note valide");
+            return;
+         }
+
+         try {
+            // Désactive le bouton pendant l'envoi
+            ratingBtn.disabled = true;
+            ratingBtn.textContent = "Envoi en cours...";
+
+            const response = await fetch(`http://localhost:8080/ratings/${recipeId}/${ratingValue}`, {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json"
+               }
+            });
+
+            if (!response.ok) {
+               const errorData = await response.json();
+               throw new Error(errorData.message || "Erreur lors de l'envoi de la note");
+            }
+
+            // Recharge la note moyenne
+            await loadRecipeRating();
+
+            // Feedback visuel
+            const ratingElement = document.getElementById("recipe-rating");
+            ratingElement.classList.add("text-green-500", "font-bold");
+            setTimeout(() => {
+               ratingElement.classList.remove("text-green-500", "font-bold");
+            }, 2000);
+
+         } catch (error) {
+            console.error("Erreur:", error);
+            alert(error.message || "Erreur lors de l'envoi de la note");
+         } finally {
+            // Réactive le bouton
+            ratingBtn.disabled = false;
+            ratingBtn.textContent = "Envoyer la note";
+         }
+      });
+
+   });
+
+
+   </script>
+
+
+
+
+
+
+
+
+   <body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
+
+      <!-- Nom de l'utilisateur connecté -->
+      <div class="w-full max-w-4xl mb-6 flex justify-between items-center">
+         <h1 class="text-2xl font-bold">Bienvenue, <span class="text-indigo-600" id="username-display"></span> !</h1>
+         <button onclick="history.back()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition">
+            Retour à la liste
+         </button>
+      </div>
+
+      <!-- Carte de la recette -->
+      <div class="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-6">
+
+         <!-- Image de la recette -->
+         <img id="recipe-image" src="" alt="Image de la recette" class="rounded-xl w-full h-64 object-cover mb-6">
+
+
+         <!-- Titre de la recette -->
+         <h2 id="recipe-title" class="text-3xl font-bold mb-4"></h2>
+
+
+         <!-- Note moyenne -->
+         <div class="flex items-center mb-6">
+            <span class="text-gray-600">Note moyenne : </span>
+            <span id="recipe-rating" class="text-gray-600"></span>
+         </div>
+
+         <!-- Ingrédients -->
+         <div class="mb-6">
+            <h3 class="text-2xl font-semibold mb-2">Ingrédients</h3>
+            <ul id="recipe-ingredients" class="list-disc list-inside space-y-1">
+            </ul>
+         </div>
+
+         <!-- Instructions -->
+         <div class="mb-6">
+            <h3 class="text-2xl font-semibold mb-2">Préparation</h3>
+            <p id="recipe-instructions" class="text-gray-700"></p>
+         </div>
+
+
+
+
+
+
+         <!-- Commentaire -->
+         <div class="border-t pt-6 mt-6">
+            <h3 class="text-2xl font-semibold mb-4">Laisser un commentaire</h3>
+         </div>
+
+         <!-- formulaire de la note et commentaire -->
+         <form id="comment-form" class="space-y-4">
+            <textarea id="comment-text" class="w-full border rounded-lg p-3 resize-none" placeholder="Votre commentaire..." rows="4"></textarea>
+
+            <button type="button" id="send-comment" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition">
+               Envoyer le commentaire
+            </button>
+
+            <div class="flex items-center space-x-4">
+               <label class="font-medium">Votre note :</label>
+               <select id="comment-rating" class="border rounded-lg p-2">
+                  <option value="0">0 étoile</option>
+                  <option value="1">1 étoile</option>
+                  <option value="2">2 étoiles</option>
+                  <option value="3">3 étoiles</option>
+                  <option value="4">4 étoiles</option>
+                  <option value="5">5 étoiles</option>
+               </select>
+            </div>
+
+            <button type="button" id="send-rating" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+               Envoyer la note
+            </button>
+         </form>
+
+
+
+         <!-- Liste des anciens commentaires -->
+         <div class="mt-10">Commentaires
+            <h3 class="text-2xl font-semibold mb-4">Commentaires</h3>
+
+            <div class="space-y-6">
+
+            </div>
+         </div>
+
+
+      </div>
+
+   </body>
+</html>
