@@ -1,6 +1,5 @@
 "use strict";
 class Recipe {
-    // Constructor ensures all required properties are provided
     constructor(name, description, ingredients, url, image, rating, directions) {
         if (!name || !description || !ingredients || ingredients.length === 0) {
             throw new Error("Missing required properties or ingredients.");
@@ -13,15 +12,9 @@ class Recipe {
         this.rating = rating;
         this.directions = directions;
     }
-    // Example method to return ingredients as a formatted string
+    // Get the list of ingredients
     getIngredientsList() {
         return this.ingredients.join(', ');
-    }
-    // You could add more methods to interact with the recipe
-    printRecipeDetails() {
-        console.log(`Recipe: ${this.title}`);
-        console.log(`Description: ${this.description}`);
-        console.log(`Ingredients: ${this.getIngredientsList()}`);
     }
 }
 //# sourceMappingURL=Recipe.js.map

@@ -18,9 +18,9 @@ let RecipeList = class RecipeList extends LitElement {
             ? html `<p>No recipes found. Try searching!</p>`
             : this.recipes.map((recipe) => html `
                 <div class="recipe">
-                  <img src="${recipe.image}" alt="${recipe.title}" />
                   <div class="info">
-                    <strong>${recipe.name}</strong>
+                      <img src="${recipe.image}" />
+                    <strong>${recipe.title}</strong>
                     <span class="rating">⭐ ${recipe.rating}</span>
                   </div>
                 </div>
