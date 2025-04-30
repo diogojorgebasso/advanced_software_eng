@@ -18,6 +18,21 @@
    async function loadRecipeDetails() {
       try {
 
+         
+            const response_auth = await fetch('http://localhost:8080/api/auth/current-user', {
+               method: 'GET',
+               credentials: 'include'
+            });
+
+
+         if (response_auth.ok) {
+            const userData = await response_auth.json();
+            console.log("userData:", userData); 
+            document.getElementById("username-display").textContent = userData.username;
+         }
+         else {
+            document.getElementById("username-display").textContent = "";
+         }
 
          const response = await fetch(`http://localhost:8080/api/recipes/${recipeId}`);
          const recipe = await response.json();
@@ -123,6 +138,7 @@
             if (response_test.ok) {
                const userData = await response_test.json();
                console.log("userData:", userData); 
+               document.getElementById("username-display").value = userData.username;
                const response = await fetch(`http://localhost:8080/comments/recipe/${recipeId}`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
@@ -130,7 +146,9 @@
                      text: commentText,
                      author: userData.username // à remplacer plus tard par l'utilisateur connect
                   })
+
                });
+
 
                if (!response.ok) throw new Error("Erreur lors de l'envoi du commentaire.");
                document.getElementById("comment-text").value = "";
@@ -210,7 +228,7 @@
 
       <!-- Nom de l'utilisateur connecté -->
       <div class="w-full max-w-4xl mb-6 flex justify-between items-center">
-         <h1 class="text-2xl font-bold">Bienvenue, <span class="text-indigo-600">Utilisateur</span> !</h1>
+         <h1 class="text-2xl font-bold">Bienvenue, <span class="text-indigo-600" id="username-display"></span> !</h1>
          <button onclick="history.back()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition">
             Retour à la liste
          </button>
